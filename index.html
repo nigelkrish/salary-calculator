@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Salary Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 10px;
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 20px 15px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+        .toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            background: #e4e6eb;
+            border-radius: 25px;
+            padding: 4px;
+            width: 100%;
+        }
+        .toggle-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 10px 0;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 22px;
+            transition: all 0.3s ease;
+            color: #65676b;
+            text-align: center;
+        }
+        .toggle-btn.active {
+            background: #27ae60;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            color: #444;
+            font-size: 13.5px;
+            margin-bottom: 5px;
+        }
+        label small {
+            font-weight: normal;
+            color: #666;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccd0d5;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: right;
+            background-color: #f9f9f9;
+            transition: border 0.2s;
+        }
+        input:focus {
+            border-color: #27ae60;
+            background-color: #fff;
+            outline: none;
+        }
+        button.calc-btn {
+            width: 100%;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 17px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3);
+            transition: background 0.3s;
+        }
+        button.calc-btn:active {
+            background-color: #219653;
+            transform: scale(0.98);
+        }
+        .results {
+            margin-top: 20px;
+            background: #e8f8f5;
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 5px solid #27ae60;
+        }
+        .results h3 {
+            margin-top: 0;
+            color: #16a085;
+            font-size: 18px;
+            text-align: center;
+            border-bottom: 1px solid #d4efdf;
+            padding-bottom: 8px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 9px;
+            font-size: 14.5px;
+        }
+        .result-row span:first-child {
+            color: #333;
+            padding-right: 8px;
+            flex: 1;
+        }
+        .result-row span:last-child {
+            font-weight: bold;
+            color: #2c3e50;
+            white-space: nowrap;
+            text-align: right;
+        }
+        .sub-row {
+            padding-left: 12px;
+            font-size: 13.5px;
+            color: #555;
+        }
+        .total-salary {
+            font-size: 17px;
+            border-top: 2px dashed #a3e4d7;
+            padding-top: 10px;
+            margin-top: 10px;
+            color: #c0392b;
+        }
+        
+        /* Professional Developer Footer Styles */
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #eaeaea;
+        }
+        .footer .brand-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: #2c3e50;
+            letter-spacing: 0.5px;
+        }
+        .footer .tagline {
+            font-size: 11.5px;
+            color: #888;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 id="calculatorTitle">EMT Salary Calculator</h2>
+    
+    <!-- Profile Toggle Switch -->
+    <div class="toggle-container">
+        <button type="button" id="emtBtn" class="toggle-btn active" onclick="setProfile('emt')">EMT</button>
+        <button type="button" id="pilotBtn" class="toggle-btn" onclick="setProfile('pilot')">Pilot</button>
+    </div>
+
+    <div class="form-group">
+        <label for="basic">Basic Salary (Rs.)</label>
+        <input type="number" id="basic" value="52200" inputmode="numeric">
+    </div>
+
+    <div class="form-group">
+        <label for="allowance">Living Cost Allowance (Rs.)</label>
+        <input type="number" id="allowance" value="17800" inputmode="numeric">
+    </div>
+
+    <div class="form-group">
+        <label for="totalShifts">Total Shift</label>
+        <input type="number" id="totalShifts" value="26" inputmode="numeric">
+    </div>
+
+    <div class="form-group">
+        <label for="poyaHours">Poya / Mercantile Working Hours <br><small>(Double OT)</small></label>
+        <input type="number" id="poyaHours" value="0" step="0.5" inputmode="decimal">
+    </div>
+
+    <div class="form-group">
+        <label for="otherDeductions">Welfare & Stamp Deductions (Rs.)</label>
+        <input type="number" id="otherDeductions" value="325" inputmode="numeric">
+    </div>
+
+    <button type="button" class="calc-btn" onclick="calculateSalary()">Calculate Salary</button>
+
+    <div class="results" id="resultBox" style="display:none;">
+        <h3>Results</h3>
+        
+        <div class="result-row">
+            <span id="labelNormalOT">Normal OT:</span>
+            <span id="resNormalOT">Rs. 0.00</span>
+        </div>
+
+        <div class="result-row">
+            <span>Total Double OT:</span>
+            <span id="resDoubleOTTotal">Rs. 0.00</span>
+        </div>
+        <div class="result-row sub-row">
+            <span>↳ HD Amount:</span>
+            <span id="resHDPart">Rs. 0.00</span>
+        </div>
+        <div class="result-row sub-row">
+            <span>↳ Mercantile or Poya:</span>
+            <span id="resPoyaPart">Rs. 0.00</span>
+        </div>
+
+        <div class="result-row">
+            <span>Gross Earnings:</span>
+            <span id="resGross">Rs. 0.00</span>
+        </div>
+        <div class="result-row">
+            <span>EPF Deduction (8%):</span>
+            <span id="resEPF">Rs. 0.00</span>
+        </div>
+        <div class="result-row">
+            <span>Total Deductions:</span>
+            <span id="resDeductions">Rs. 0.00</span>
+        </div>
+        <div class="result-row total-salary">
+            <span>Net Salary:</span>
+            <span id="resNet">Rs. 0.00</span>
+        </div>
+    </div>
+
+    <!-- Professional Developer Footer -->
+    <div class="footer">
+        <div class="brand-name">Neux Tech Solutions</div>
+        <div class="tagline">Powered by Neux</div>
+    </div>
+</div>
+
+<script>
+function setProfile(profile) {
+    let basicInput = document.getElementById('basic');
+    let allowanceInput = document.getElementById('allowance');
+    let deductionsInput = document.getElementById('otherDeductions');
+    let title = document.getElementById('calculatorTitle');
+    let emtBtn = document.getElementById('emtBtn');
+    let pilotBtn = document.getElementById('pilotBtn');
+
+    if (profile === 'emt') {
+        emtBtn.classList.add('active');
+        pilotBtn.classList.remove('active');
+        title.innerText = "EMT Salary Calculator";
+        basicInput.value = 52200;
+        allowanceInput.value = 17800;
+        deductionsInput.value = 325;
+    } else {
+        pilotBtn.classList.add('active');
+        emtBtn.classList.remove('active');
+        title.innerText = "Pilot Salary Calculator";
+        basicInput.value = 47200;
+        allowanceInput.value = 17800;
+        deductionsInput.value = 325;
+    }
+    if(document.getElementById('resultBox').style.display === 'block') {
+        calculateSalary();
+    }
+}
+
+function calculateSalary() {
+    let basic = parseFloat(document.getElementById('basic').value) || 0;
+    let allowance = parseFloat(document.getElementById('allowance').value) || 0;
+    let totalShifts = parseFloat(document.getElementById('totalShifts').value) || 0;
+    let poyaHours = parseFloat(document.getElementById('poyaHours').value) || 0;
+    let otherDeductions = parseFloat(document.getElementById('otherDeductions').value) || 0;
+
+    let isPilot = document.getElementById('pilotBtn').classList.contains('active');
+    
+    let normalOTRate = isPilot ? 295.00 : 326.25;
+    let doubleOTRate = isPilot ? 393.33 : 435.00;
+
+    let hdShifts = Math.floor(totalShifts / 6);
+    let normalShiftsCount = totalShifts - hdShifts;
+
+    let normalOTHours = normalShiftsCount * 3;
+    let normalOTTotal = normalOTHours * normalOTRate;
+
+    let hdDTOUnits = hdShifts * 8;
+    let hdTotal = hdDTOUnits * doubleOTRate;
+
+    let poyaTotal = poyaHours * doubleOTRate;
+
+    let totalDoubleOTUnits = hdDTOUnits + poyaHours;
+    let doubleOTTotal = hdTotal + poyaTotal;
+
+    let grossSalary = basic + allowance + normalOTTotal + doubleOTTotal;
+    let epfDeduction = (basic + allowance) * 0.08;
+    let totalDeductions = epfDeduction + otherDeductions;
+    let netSalary = grossSalary - totalDeductions;
+
+    document.getElementById('labelNormalOT').innerText = `Normal OT (${normalOTHours} hrs):`;
+
+    document.getElementById('resNormalOT').innerText = "Rs. " + normalOTTotal.toFixed(2);
+    document.getElementById('resDoubleOTTotal').innerText = "Rs. " + doubleOTTotal.toFixed(2) + " (" + totalDoubleOTUnits + " units)";
+    document.getElementById('resHDPart').innerText = "Rs. " + hdTotal.toFixed(2) + " (" + hdShifts + " shifts / " + hdDTOUnits + " hrs)";
+    document.getElementById('resPoyaPart').innerText = "Rs. " + poyaTotal.toFixed(2) + " (" + poyaHours + " hrs)";
+    document.getElementById('resGross').innerText = "Rs. " + grossSalary.toFixed(2);
+    document.getElementById('resEPF').innerText = "Rs. " + epfDeduction.toFixed(2);
+    document.getElementById('resDeductions').innerText = "Rs. " + totalDeductions.toFixed(2);
+    document.getElementById('resNet').innerText = "Rs. " + netSalary.toFixed(2);
+
+    document.getElementById('resultBox').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
