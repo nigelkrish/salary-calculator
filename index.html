@@ -88,6 +88,60 @@
             background-color: #fff;
             outline: none;
         }
+        
+        /* Extra Duty Poya Toggle Switch Styles */
+        .extra-toggle-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f9f9f9;
+            border: 1px solid #ccd0d5;
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+        .extra-toggle-box span {
+            font-weight: 600;
+            color: #444;
+            font-size: 13.5px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 26px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #27ae60;
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
         button.calc-btn {
             width: 100%;
             background-color: #27ae60;
@@ -199,13 +253,27 @@
     </div>
 
     <div class="form-group">
-        <label for="hdShiftsInput">HD Shifts Count <br><small>(Manual input)</small></label>
+        <label for="hdShiftsInput">HD Shifts Count</label>
         <input type="number" id="hdShiftsInput" value="3" inputmode="numeric">
     </div>
 
     <div class="form-group">
-        <label for="poyaHours">Poya / Mercantile Working Hours <br><small>(Double OT)</small></label>
-        <input type="number" id="poyaHours" value="0" step="0.5" inputmode="decimal">
+        <label for="poyaHours">Poya / Mercantile Working Hours <br><small>Max 22 hours</small></label>
+        <input type="number" id="poyaHours" value="0" step="0.5" inputmode="decimal" max="22">
+    </div>
+
+    <div class="form-group">
+        <label for="extraDutyHours">Extra Duty Hours <br><small>Max 22 hours</small></label>
+        <input type="number" id="extraDutyHours" value="0" step="0.5" inputmode="decimal" max="22">
+    </div>
+
+    <!-- Extra Duty Poya Toggle Switch -->
+    <div class="extra-toggle-box">
+        <span>Is Extra Duty on Poya/Mercantile?</span>
+        <label class="switch">
+            <input type="checkbox" id="extraPoyaToggle">
+            <span class="slider"></span>
+        </label>
     </div>
 
     <div class="form-group">
@@ -234,6 +302,11 @@
         <div class="result-row sub-row">
             <span>↳ Mercantile or Poya:</span>
             <span id="resPoyaPart">Rs. 0.00</span>
+        </div>
+
+        <div class="result-row">
+            <span id="labelExtraDuty">Extra Duty:</span>
+            <span id="resExtraDuty">Rs. 0.00</span>
         </div>
 
         <div class="result-row">
@@ -296,40 +369,62 @@ function calculateSalary() {
     let totalShifts = parseFloat(document.getElementById('totalShifts').value) || 0;
     let hdShiftsInput = parseFloat(document.getElementById('hdShiftsInput').value) || 0;
     let poyaHours = parseFloat(document.getElementById('poyaHours').value) || 0;
+    let extraDutyHours = parseFloat(document.getElementById('extraDutyHours').value) || 0;
+    let isExtraPoya = document.getElementById('extraPoyaToggle').checked;
+    
+    if (poyaHours > 22) {
+        poyaHours = 22;
+        document.getElementById('poyaHours').value = 22;
+    }
+
+    if (extraDutyHours > 22) {
+        extraDutyHours = 22;
+        document.getElementById('extraDutyHours').value = 22;
+    }
+
     let otherDeductions = parseFloat(document.getElementById('otherDeductions').value) || 0;
 
     let isPilot = document.getElementById('pilotBtn').classList.contains('active');
     
     let normalOTRate = isPilot ? 295.00 : 326.25;
-    let doubleOTRate = isPilot ? 393.33 : 435.00;
+    let doubleOTRate = isPilot ? 393.33 : 435.00; // Poya / Mercantile rate
 
-    // Normal shifts = Total shifts - Manual HD shifts
+    // Extra duty rate depends on the toggle switch
+    let extraDutyRate;
+    if (isExtraPoya) {
+        extraDutyRate = isPilot ? 393.33 : 435.00; // Poya Double OT rate
+    } else {
+        extraDutyRate = isPilot ? 295.00 : 326.25; // Normal Extra Duty rate
+    }
+
     let normalShiftsCount = totalShifts - hdShiftsInput;
     if (normalShiftsCount < 0) normalShiftsCount = 0;
 
     let normalOTHours = normalShiftsCount * 3;
     let normalOTTotal = normalOTHours * normalOTRate;
 
-    // HD units based on manual HD shifts input (1 HD shift = 8 hrs)
     let hdDTOUnits = hdShiftsInput * 8;
     let hdTotal = hdDTOUnits * doubleOTRate;
 
     let poyaTotal = poyaHours * doubleOTRate;
+    let extraDutyTotal = extraDutyHours * extraDutyRate;
 
     let totalDoubleOTUnits = hdDTOUnits + poyaHours;
     let doubleOTTotal = hdTotal + poyaTotal;
 
-    let grossSalary = basic + allowance + normalOTTotal + doubleOTTotal;
+    let grossSalary = basic + allowance + normalOTTotal + doubleOTTotal + extraDutyTotal;
     let epfDeduction = (basic + allowance) * 0.08;
     let totalDeductions = epfDeduction + otherDeductions;
     let netSalary = grossSalary - totalDeductions;
 
     document.getElementById('labelNormalOT').innerText = `Normal OT (${normalOTHours} hrs):`;
+    document.getElementById('labelExtraDuty').innerText = `Extra Duty (${extraDutyHours} hrs)${isExtraPoya ? ' [Poya]' : ''}:`;
 
     document.getElementById('resNormalOT').innerText = "Rs. " + normalOTTotal.toFixed(2);
     document.getElementById('resDoubleOTTotal').innerText = "Rs. " + doubleOTTotal.toFixed(2) + " (" + totalDoubleOTUnits + " hrs)";
     document.getElementById('resHDPart').innerText = "Rs. " + hdTotal.toFixed(2) + " (" + hdShiftsInput + " shifts / " + hdDTOUnits + " hrs)";
     document.getElementById('resPoyaPart').innerText = "Rs. " + poyaTotal.toFixed(2) + " (" + poyaHours + " hrs)";
+    document.getElementById('resExtraDuty').innerText = "Rs. " + extraDutyTotal.toFixed(2);
     document.getElementById('resGross').innerText = "Rs. " + grossSalary.toFixed(2);
     document.getElementById('resEPF').innerText = "Rs. " + epfDeduction.toFixed(2);
     document.getElementById('resDeductions').innerText = "Rs. " + totalDeductions.toFixed(2);
