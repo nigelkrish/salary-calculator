@@ -194,8 +194,13 @@
     </div>
 
     <div class="form-group">
-        <label for="totalShifts">Total Shift</label>
+        <label for="totalShifts">Total Shift Count</label>
         <input type="number" id="totalShifts" value="26" inputmode="numeric">
+    </div>
+
+    <div class="form-group">
+        <label for="hdShiftsInput">HD Shifts Count <br><small>(Manual input)</small></label>
+        <input type="number" id="hdShiftsInput" value="3" inputmode="numeric">
     </div>
 
     <div class="form-group">
@@ -289,6 +294,7 @@ function calculateSalary() {
     let basic = parseFloat(document.getElementById('basic').value) || 0;
     let allowance = parseFloat(document.getElementById('allowance').value) || 0;
     let totalShifts = parseFloat(document.getElementById('totalShifts').value) || 0;
+    let hdShiftsInput = parseFloat(document.getElementById('hdShiftsInput').value) || 0;
     let poyaHours = parseFloat(document.getElementById('poyaHours').value) || 0;
     let otherDeductions = parseFloat(document.getElementById('otherDeductions').value) || 0;
 
@@ -297,13 +303,15 @@ function calculateSalary() {
     let normalOTRate = isPilot ? 295.00 : 326.25;
     let doubleOTRate = isPilot ? 393.33 : 435.00;
 
-    let hdShifts = Math.floor(totalShifts / 6);
-    let normalShiftsCount = totalShifts - hdShifts;
+    // Normal shifts = Total shifts - Manual HD shifts
+    let normalShiftsCount = totalShifts - hdShiftsInput;
+    if (normalShiftsCount < 0) normalShiftsCount = 0;
 
     let normalOTHours = normalShiftsCount * 3;
     let normalOTTotal = normalOTHours * normalOTRate;
 
-    let hdDTOUnits = hdShifts * 8;
+    // HD units based on manual HD shifts input (1 HD shift = 8 hrs)
+    let hdDTOUnits = hdShiftsInput * 8;
     let hdTotal = hdDTOUnits * doubleOTRate;
 
     let poyaTotal = poyaHours * doubleOTRate;
@@ -320,7 +328,7 @@ function calculateSalary() {
 
     document.getElementById('resNormalOT').innerText = "Rs. " + normalOTTotal.toFixed(2);
     document.getElementById('resDoubleOTTotal').innerText = "Rs. " + doubleOTTotal.toFixed(2) + " (" + totalDoubleOTUnits + " hrs)";
-    document.getElementById('resHDPart').innerText = "Rs. " + hdTotal.toFixed(2) + " (" + hdShifts + " shifts / " + hdDTOUnits + " hrs)";
+    document.getElementById('resHDPart').innerText = "Rs. " + hdTotal.toFixed(2) + " (" + hdShiftsInput + " shifts / " + hdDTOUnits + " hrs)";
     document.getElementById('resPoyaPart').innerText = "Rs. " + poyaTotal.toFixed(2) + " (" + poyaHours + " hrs)";
     document.getElementById('resGross').innerText = "Rs. " + grossSalary.toFixed(2);
     document.getElementById('resEPF').innerText = "Rs. " + epfDeduction.toFixed(2);
