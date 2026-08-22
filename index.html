@@ -372,12 +372,19 @@ function calculateSalary() {
     let extraDutyHours = parseFloat(document.getElementById('extraDutyHours').value) || 0;
     let isExtraPoya = document.getElementById('extraPoyaToggle').checked;
     
+    // Toggle ON සහ Extra Duty පැය 22 ක් හෝ ඊට වැඩි නම් උපරිම පැය 8 කට සීමා කර ඇඟවීමක් (Popup) ලබා දීම
+    if (isExtraPoya && extraDutyHours >= 22) {
+        extraDutyHours = 8;
+        document.getElementById('extraDutyHours').value = 8;
+        alert("පෝය දවසේ extra duty එකක් සිදු කිරීමේදී පෝය දවසට අදාළ 14 hours double OT හා 8 Hours Normal OT ලෙස ලබා දී ඇති බව සලකන්න.");
+    }
+
     if (poyaHours > 22) {
         poyaHours = 22;
         document.getElementById('poyaHours').value = 22;
     }
 
-    if (extraDutyHours > 22) {
+    if (!isExtraPoya && extraDutyHours > 22) {
         extraDutyHours = 22;
         document.getElementById('extraDutyHours').value = 22;
     }
@@ -387,29 +394,60 @@ function calculateSalary() {
     let isPilot = document.getElementById('pilotBtn').classList.contains('active');
     
     let normalOTRate = isPilot ? 295.00 : 326.25;
-    let doubleOTRate = isPilot ? 393.33 : 435.00; // Poya / Mercantile rate
+    let doubleOTRate = isPilot ? 393.33 : 435.00;
+    let normalExtraRate = isPilot ? 295.00 : 326.25;
 
-    // Extra duty rate depends on the toggle switch
-    let extraDutyRate;
-    if (isExtraPoya) {
-        extraDutyRate = isPilot ? 393.33 : 435.00; // Poya Double OT rate
-    } else {
-        extraDutyRate = isPilot ? 295.00 : 326.25; // Normal Extra Duty rate
-    }
-
+    // Normal shifts count calculation
     let normalShiftsCount = totalShifts - hdShiftsInput;
     if (normalShiftsCount < 0) normalShiftsCount = 0;
 
+    // Base Normal OT Hours
     let normalOTHours = normalShiftsCount * 3;
+
+    // Deduct Normal OT hours based on Poya hours / Extra Duty Poya condition
+    let targetHours = poyaHours;
+    if (isExtraPoya && extraDutyHours >= 8) {
+        targetHours = 14;
+    }
+
+    if (targetHours >= 14) {
+        normalOTHours -= 6;
+    } else if (targetHours >= 8) {
+        normalOTHours -= 3;
+    }
+
+    if (normalOTHours < 0) {
+        normalOTHours = 0;
+    }
+
     let normalOTTotal = normalOTHours * normalOTRate;
 
     let hdDTOUnits = hdShiftsInput * 8;
     let hdTotal = hdDTOUnits * doubleOTRate;
 
-    let poyaTotal = poyaHours * doubleOTRate;
-    let extraDutyTotal = extraDutyHours * extraDutyRate;
+    let poyaTotal = 0;
+    let totalPoyaDoubleOTHours = 0;
+    let extraDutyTotal = 0;
+    let poyaPartDisplay = "";
 
-    let totalDoubleOTUnits = hdDTOUnits + poyaHours;
+    if (isExtraPoya) {
+        // Toggle ON: Poya double OT එක උපරිම පැය 14 කට සීමා වේ
+        totalPoyaDoubleOTHours = poyaHours > 14 ? 14 : poyaHours;
+        poyaTotal = totalPoyaDoubleOTHours * doubleOTRate;
+        poyaPartDisplay = "Rs. " + poyaTotal.toFixed(2) + " (" + totalPoyaDoubleOTHours + " hrs)";
+
+        // Extra Duty: පරිශීලකයා ඇතුළත් කරන සැබෑ extraDutyHours ප්‍රමාණයට (උපරිම 8 දක්වා) සාමාන්‍ය අනුපාතය ගුණ වේ
+        extraDutyTotal = extraDutyHours * normalExtraRate;
+    } else {
+        // Toggle OFF: සාමාන්‍ය ක්‍රමය
+        totalPoyaDoubleOTHours = poyaHours;
+        poyaTotal = poyaHours * doubleOTRate;
+        poyaPartDisplay = "Rs. " + poyaTotal.toFixed(2) + " (" + totalPoyaDoubleOTHours + " hrs)";
+
+        extraDutyTotal = extraDutyHours * normalExtraRate;
+    }
+
+    let totalDoubleOTUnits = hdDTOUnits + totalPoyaDoubleOTHours;
     let doubleOTTotal = hdTotal + poyaTotal;
 
     let grossSalary = basic + allowance + normalOTTotal + doubleOTTotal + extraDutyTotal;
@@ -418,12 +456,17 @@ function calculateSalary() {
     let netSalary = grossSalary - totalDeductions;
 
     document.getElementById('labelNormalOT').innerText = `Normal OT (${normalOTHours} hrs):`;
-    document.getElementById('labelExtraDuty').innerText = `Extra Duty (${extraDutyHours} hrs)${isExtraPoya ? ' [Poya]' : ''}:`;
+    
+    let extraDutyLabelText = `Extra Duty (${extraDutyHours} hrs)`;
+    if (isExtraPoya) {
+        extraDutyLabelText += ` [Poya Extra]`;
+    }
+    document.getElementById('labelExtraDuty').innerText = extraDutyLabelText + ":";
 
     document.getElementById('resNormalOT').innerText = "Rs. " + normalOTTotal.toFixed(2);
     document.getElementById('resDoubleOTTotal').innerText = "Rs. " + doubleOTTotal.toFixed(2) + " (" + totalDoubleOTUnits + " hrs)";
     document.getElementById('resHDPart').innerText = "Rs. " + hdTotal.toFixed(2) + " (" + hdShiftsInput + " shifts / " + hdDTOUnits + " hrs)";
-    document.getElementById('resPoyaPart').innerText = "Rs. " + poyaTotal.toFixed(2) + " (" + poyaHours + " hrs)";
+    document.getElementById('resPoyaPart').innerHTML = poyaPartDisplay;
     document.getElementById('resExtraDuty').innerText = "Rs. " + extraDutyTotal.toFixed(2);
     document.getElementById('resGross').innerText = "Rs. " + grossSalary.toFixed(2);
     document.getElementById('resEPF').innerText = "Rs. " + epfDeduction.toFixed(2);
