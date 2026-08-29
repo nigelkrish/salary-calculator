@@ -89,57 +89,62 @@
             outline: none;
         }
         
-        /* Extra Duty Poya Toggle Switch Styles */
-        .extra-toggle-box {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f9f9f9;
-            border: 1px solid #ccd0d5;
-            padding: 10px 12px;
-            border-radius: 10px;
+        /* Shift Grid Box Styles */
+        .shift-breakdown-box {
+            background: #fdfefe;
+            border: 1px solid #d5dbdb;
+            padding: 12px;
+            border-radius: 12px;
             margin-bottom: 12px;
         }
-        .extra-toggle-box span {
-            font-weight: 600;
-            color: #444;
-            font-size: 13.5px;
+        .shift-breakdown-box legend {
+            font-weight: bold;
+            font-size: 14px;
+            color: #2c3e50;
+            padding: 0 6px;
         }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 26px;
+        .shift-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 5px;
         }
-        .switch input { 
-            opacity: 0;
-            width: 0;
-            height: 0;
+        .shift-item label {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 2px;
+            text-align: center;
         }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .3s;
-            border-radius: 26px;
+        .shift-item input {
+            padding: 8px;
+            font-size: 14px;
         }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 20px;
-            width: 20px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .3s;
-            border-radius: 50%;
+        
+        .shift-summary-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #d5dbdb;
         }
-        input:checked + .slider {
-            background-color: #27ae60;
+        .shift-summary-item label {
+            font-size: 12px;
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 2px;
+            text-align: center;
         }
-        input:checked + .slider:before {
-            transform: translateX(24px);
+        .shift-summary-item input {
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        input[readonly] {
+            background-color: #eaeded;
+            color: #2c3e50;
+            font-weight: bold;
+            cursor: not-allowed;
         }
 
         button.calc-btn {
@@ -198,6 +203,14 @@
             font-size: 13.5px;
             color: #555;
         }
+        .section-header {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            border-top: 1px dashed #d4efdf;
+            padding-top: 8px;
+        }
         .total-salary {
             font-size: 17px;
             border-top: 2px dashed #a3e4d7;
@@ -205,8 +218,48 @@
             margin-top: 10px;
             color: #c0392b;
         }
+        .company-contrib-header {
+            font-weight: bold;
+            color: #2980b9;
+            margin-top: 12px;
+            margin-bottom: 5px;
+            border-top: 1px dashed #a9cce3;
+            padding-top: 8px;
+        }
         
-        /* Professional Developer Footer Styles */
+        /* Explanation Guide Styles */
+        .formula-guide {
+            margin-top: 15px;
+            background: #fdfefe;
+            border: 1px solid #a3e4d7;
+            border-radius: 10px;
+            padding: 12px;
+        }
+        .formula-guide summary {
+            font-weight: bold;
+            color: #16a085;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .formula-guide ul {
+            margin: 8px 0 0 15px;
+            padding: 0;
+            font-size: 12.5px;
+            color: #444;
+            line-height: 1.5;
+        }
+        .formula-guide li {
+            margin-bottom: 6px;
+        }
+        .formula-guide .note-li {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #a3e4d7;
+            color: #7d6608;
+            list-style: none;
+            margin-left: -15px;
+        }
+
         .footer {
             text-align: center;
             margin-top: 25px;
@@ -247,38 +300,51 @@
         <input type="number" id="allowance" value="17800" inputmode="numeric">
     </div>
 
-    <div class="form-group">
-        <label for="totalShifts">Total Shift Count</label>
-        <input type="number" id="totalShifts" value="26" inputmode="numeric">
-    </div>
+    <!-- Shift Breakdown Section -->
+    <fieldset class="shift-breakdown-box">
+        <legend>Shift Breakdown Details</legend>
+        <div class="shift-grid">
+            <div class="shift-item">
+                <label for="dayShift">Day Shift</label>
+                <input type="number" id="dayShift" value="0" inputmode="numeric" oninput="updateTotalShifts()">
+            </div>
+            <div class="shift-item">
+                <label for="nightShift">Night Shift</label>
+                <input type="number" id="nightShift" value="0" inputmode="numeric" oninput="updateTotalShifts()">
+            </div>
+            <div class="shift-item">
+                <label for="sbShift">SB</label>
+                <input type="number" id="sbShift" value="0" inputmode="numeric" oninput="updateTotalShifts()">
+            </div>
+            <div class="shift-item">
+                <label for="p1Shift">P1 <small>(Hours)</small></label>
+                <input type="number" id="p1Shift" value="0" step="0.5" inputmode="decimal">
+            </div>
+            <div class="shift-item">
+                <label for="pShift">P <small>(Hours)</small></label>
+                <input type="number" id="pShift" value="0" step="0.5" inputmode="decimal">
+            </div>
+            <div class="shift-item">
+                <label for="p2Shift">P2 <small>(Hours)</small></label>
+                <input type="number" id="p2Shift" value="0" step="0.5" inputmode="decimal">
+            </div>
+        </div>
+
+        <div class="shift-summary-row">
+            <div class="shift-summary-item">
+                <label for="totalShifts">Total Shifts</label>
+                <input type="number" id="totalShifts" value="26" readonly>
+            </div>
+            <div class="shift-summary-item">
+                <label for="hdShiftsInput">HD Shifts Count</label>
+                <input type="number" id="hdShiftsInput" value="3" inputmode="numeric">
+            </div>
+        </div>
+    </fieldset>
 
     <div class="form-group">
-        <label for="hdShiftsInput">HD Shifts Count</label>
-        <input type="number" id="hdShiftsInput" value="3" inputmode="numeric">
-    </div>
-
-    <div class="form-group">
-        <label for="poyaHours">Poya / Mercantile Working Hours <br><small>Max 22 hours</small></label>
-        <input type="number" id="poyaHours" value="0" step="0.5" inputmode="decimal" max="22">
-    </div>
-
-    <div class="form-group">
-        <label for="extraDutyHours">Extra Duty Hours <br><small>Max 22 hours</small></label>
-        <input type="number" id="extraDutyHours" value="0" step="0.5" inputmode="decimal" max="22">
-    </div>
-
-    <!-- Extra Duty Poya Toggle Switch -->
-    <div class="extra-toggle-box">
-        <span>Is Extra Duty on Poya/Mercantile?</span>
-        <label class="switch">
-            <input type="checkbox" id="extraPoyaToggle">
-            <span class="slider"></span>
-        </label>
-    </div>
-
-    <div class="form-group">
-        <label for="otherDeductions">Welfare & Stamp Deductions (Rs.)</label>
-        <input type="number" id="otherDeductions" value="325" inputmode="numeric">
+        <label for="extraDutyHours">Extra Duty Hours</label>
+        <input type="number" id="extraDutyHours" value="0" step="0.5" inputmode="decimal">
     </div>
 
     <button type="button" class="calc-btn" onclick="calculateSalary()">Calculate Salary</button>
@@ -300,8 +366,8 @@
             <span id="resHDPart">Rs. 0.00</span>
         </div>
         <div class="result-row sub-row">
-            <span>↳ Mercantile or Poya:</span>
-            <span id="resPoyaPart">Rs. 0.00</span>
+            <span>↳ P1, P, P2 Double OT:</span>
+            <span id="resPPlusPart">Rs. 0.00</span>
         </div>
 
         <div class="result-row">
@@ -313,18 +379,58 @@
             <span>Gross Earnings:</span>
             <span id="resGross">Rs. 0.00</span>
         </div>
-        <div class="result-row">
+
+        <div class="section-header">Deductions:</div>
+        <div class="result-row sub-row">
             <span>EPF Deduction (8%):</span>
             <span id="resEPF">Rs. 0.00</span>
         </div>
+        <div class="result-row sub-row">
+            <span>Welfare:</span>
+            <span>Rs. 300.00</span>
+        </div>
+        <div class="result-row sub-row">
+            <span>Stamp Duty:</span>
+            <span>Rs. 25.00</span>
+        </div>
+
         <div class="result-row">
             <span>Total Deductions:</span>
             <span id="resDeductions">Rs. 0.00</span>
         </div>
+
         <div class="result-row total-salary">
             <span>Net Salary:</span>
             <span id="resNet">Rs. 0.00</span>
         </div>
+
+        <!-- Company Contributions Section -->
+        <div class="company-contrib-header">Company Contributions:</div>
+        <div class="result-row sub-row">
+            <span>EPF Company (12%):</span>
+            <span id="resEPFCompany">Rs. 0.00</span>
+        </div>
+        <div class="result-row sub-row">
+            <span>ETF Company (3%):</span>
+            <span id="resETFFCompany">Rs. 0.00</span>
+        </div>
+
+        <!-- Calculation Formula Guide for Reviewers -->
+        <details class="formula-guide">
+            <summary>ගණනය කිරීමේ ක්‍රමවේදය (View Calculation Logic)</summary>
+            <ul>
+                <li><b>Normal OT Rate:</b> (Basic / 240) × 1.5</li>
+                <li><b>Double OT Rate:</b> (Basic / 240) × 2.0</li>
+                <li><b>Normal OT Total:</b> Total Shifts × 3 hrs × Normal OT Rate</li>
+                <li><b>Double OT (HD):</b> HD Shifts Count × 6 units × Double OT Rate</li>
+                <li><b>Double OT (P1, P, P2):</b> Total Hours × Double OT Rate</li>
+                <li><b>Gross Earnings:</b> Basic + Allowance + Normal OT + Double OT + Extra Duty</li>
+                <li><b>Total Deductions:</b> [ (Basic + Allowance) × 8% ] + Welfare (300) + Stamp Duty (25)</li>
+                <li><b>Net Salary:</b> Gross Earnings - Total Deductions</li>
+                <li><b>EPF / ETF Company:</b> (Basic + Allowance) × 12% / 3%</li>
+                <li class="note-li"><b>විශේෂ සටහන:</b> HD අගය පසුගිය මාසයේ රොස්ටර් එක ඇසුරින් ගණනය වන බැවින්, ඔබ ගන්නා නිවාඩු හෝ පෝය / වෙළඳ නිවාඩු දිනවලදී (Mercantile Day) HD ගණනට ගණනය වන Day හෝ Night ශිෆ්ට් එකක් යෙදුනොත් වැටුප වෙනස් වන බව සලකන්න.</li>
+            </ul>
+        </details>
     </div>
 
     <!-- Professional Developer Footer -->
@@ -335,10 +441,18 @@
 </div>
 
 <script>
+function updateTotalShifts() {
+    let day = parseFloat(document.getElementById('dayShift').value) || 0;
+    let night = parseFloat(document.getElementById('nightShift').value) || 0;
+    let sb = parseFloat(document.getElementById('sbShift').value) || 0;
+
+    let total = day + night + sb;
+    document.getElementById('totalShifts').value = total;
+}
+
 function setProfile(profile) {
     let basicInput = document.getElementById('basic');
     let allowanceInput = document.getElementById('allowance');
-    let deductionsInput = document.getElementById('otherDeductions');
     let title = document.getElementById('calculatorTitle');
     let emtBtn = document.getElementById('emtBtn');
     let pilotBtn = document.getElementById('pilotBtn');
@@ -349,14 +463,12 @@ function setProfile(profile) {
         title.innerText = "EMT Salary Calculator";
         basicInput.value = 52200;
         allowanceInput.value = 17800;
-        deductionsInput.value = 325;
     } else {
         pilotBtn.classList.add('active');
         emtBtn.classList.remove('active');
         title.innerText = "Pilot Salary Calculator";
         basicInput.value = 47200;
         allowanceInput.value = 17800;
-        deductionsInput.value = 325;
     }
     if(document.getElementById('resultBox').style.display === 'block') {
         calculateSalary();
@@ -364,114 +476,63 @@ function setProfile(profile) {
 }
 
 function calculateSalary() {
+    updateTotalShifts();
+
     let basic = parseFloat(document.getElementById('basic').value) || 0;
     let allowance = parseFloat(document.getElementById('allowance').value) || 0;
     let totalShifts = parseFloat(document.getElementById('totalShifts').value) || 0;
     let hdShiftsInput = parseFloat(document.getElementById('hdShiftsInput').value) || 0;
-    let poyaHours = parseFloat(document.getElementById('poyaHours').value) || 0;
+    
+    let p1Hours = parseFloat(document.getElementById('p1Shift').value) || 0;
+    let pHours = parseFloat(document.getElementById('pShift').value) || 0;
+    let p2Hours = parseFloat(document.getElementById('p2Shift').value) || 0;
+    let totalPPlusHours = p1Hours + pHours + p2Hours;
+
     let extraDutyHours = parseFloat(document.getElementById('extraDutyHours').value) || 0;
-    let isExtraPoya = document.getElementById('extraPoyaToggle').checked;
     
-    // Toggle ON සහ Extra Duty පැය 22 ක් හෝ ඊට වැඩි නම් උපරිම පැය 8 කට සීමා කර ඇඟවීමක් (Popup) ලබා දීම
-    if (isExtraPoya && extraDutyHours >= 22) {
-        extraDutyHours = 8;
-        document.getElementById('extraDutyHours').value = 8;
-        alert("පෝය දවසේ extra duty එකක් සිදු කිරීමේදී පෝය දවසට අදාළ 14 hours double OT හා 8 Hours Normal OT ලෙස ලබා දී ඇති බව සලකන්න.");
-    }
+    let welfare = 300.00;
+    let stampDuty = 25.00;
+    let otherDeductions = welfare + stampDuty;
 
-    if (poyaHours > 22) {
-        poyaHours = 22;
-        document.getElementById('poyaHours').value = 22;
-    }
+    let normalOTRate = (basic / 240) * 1.5;
+    let doubleOTRate = (basic / 240) * 2.0;
+    let normalExtraRate = normalOTRate;
 
-    if (!isExtraPoya && extraDutyHours > 22) {
-        extraDutyHours = 22;
-        document.getElementById('extraDutyHours').value = 22;
-    }
-
-    let otherDeductions = parseFloat(document.getElementById('otherDeductions').value) || 0;
-
-    let isPilot = document.getElementById('pilotBtn').classList.contains('active');
-    
-    let normalOTRate = isPilot ? 295.00 : 326.25;
-    let doubleOTRate = isPilot ? 393.33 : 435.00;
-    let normalExtraRate = isPilot ? 295.00 : 326.25;
-
-    // Normal shifts count calculation
-    let normalShiftsCount = totalShifts - hdShiftsInput;
-    if (normalShiftsCount < 0) normalShiftsCount = 0;
-
-    // Base Normal OT Hours
-    let normalOTHours = normalShiftsCount * 3;
-
-    // Deduct Normal OT hours based on Poya hours / Extra Duty Poya condition
-    let targetHours = poyaHours;
-    if (isExtraPoya && extraDutyHours >= 8) {
-        targetHours = 14;
-    }
-
-    if (targetHours >= 14) {
-        normalOTHours -= 6;
-    } else if (targetHours >= 8) {
-        normalOTHours -= 3;
-    }
-
-    if (normalOTHours < 0) {
-        normalOTHours = 0;
-    }
-
+    let normalOTHours = totalShifts * 3;
     let normalOTTotal = normalOTHours * normalOTRate;
 
-    let hdDTOUnits = hdShiftsInput * 8;
+    let hdDTOUnits = hdShiftsInput * 6;
     let hdTotal = hdDTOUnits * doubleOTRate;
 
-    let poyaTotal = 0;
-    let totalPoyaDoubleOTHours = 0;
-    let extraDutyTotal = 0;
-    let poyaPartDisplay = "";
+    let pPlusTotal = totalPPlusHours * doubleOTRate;
+    let extraDutyTotal = extraDutyHours * normalExtraRate;
 
-    if (isExtraPoya) {
-        // Toggle ON: Poya double OT එක උපරිම පැය 14 කට සීමා වේ
-        totalPoyaDoubleOTHours = poyaHours > 14 ? 14 : poyaHours;
-        poyaTotal = totalPoyaDoubleOTHours * doubleOTRate;
-        poyaPartDisplay = "Rs. " + poyaTotal.toFixed(2) + " (" + totalPoyaDoubleOTHours + " hrs)";
-
-        // Extra Duty: පරිශීලකයා ඇතුළත් කරන සැබෑ extraDutyHours ප්‍රමාණයට (උපරිම 8 දක්වා) සාමාන්‍ය අනුපාතය ගුණ වේ
-        extraDutyTotal = extraDutyHours * normalExtraRate;
-    } else {
-        // Toggle OFF: සාමාන්‍ය ක්‍රමය
-        totalPoyaDoubleOTHours = poyaHours;
-        poyaTotal = poyaHours * doubleOTRate;
-        poyaPartDisplay = "Rs. " + poyaTotal.toFixed(2) + " (" + totalPoyaDoubleOTHours + " hrs)";
-
-        extraDutyTotal = extraDutyHours * normalExtraRate;
-    }
-
-    let totalDoubleOTUnits = hdDTOUnits + totalPoyaDoubleOTHours;
-    let doubleOTTotal = hdTotal + poyaTotal;
+    let totalDoubleOTUnits = hdDTOUnits + totalPPlusHours;
+    let doubleOTTotal = hdTotal + pPlusTotal;
 
     let grossSalary = basic + allowance + normalOTTotal + doubleOTTotal + extraDutyTotal;
     let epfDeduction = (basic + allowance) * 0.08;
     let totalDeductions = epfDeduction + otherDeductions;
     let netSalary = grossSalary - totalDeductions;
 
+    let epfCompany = (basic + allowance) * 0.12;
+    let etfCompany = (basic + allowance) * 0.03;
+
     document.getElementById('labelNormalOT').innerText = `Normal OT (${normalOTHours} hrs):`;
-    
-    let extraDutyLabelText = `Extra Duty (${extraDutyHours} hrs)`;
-    if (isExtraPoya) {
-        extraDutyLabelText += ` [Poya Extra]`;
-    }
-    document.getElementById('labelExtraDuty').innerText = extraDutyLabelText + ":";
+    document.getElementById('labelExtraDuty').innerText = `Extra Duty (${extraDutyHours} hrs):`;
 
     document.getElementById('resNormalOT').innerText = "Rs. " + normalOTTotal.toFixed(2);
     document.getElementById('resDoubleOTTotal').innerText = "Rs. " + doubleOTTotal.toFixed(2) + " (" + totalDoubleOTUnits + " hrs)";
     document.getElementById('resHDPart').innerText = "Rs. " + hdTotal.toFixed(2) + " (" + hdShiftsInput + " shifts / " + hdDTOUnits + " hrs)";
-    document.getElementById('resPoyaPart').innerHTML = poyaPartDisplay;
+    document.getElementById('resPPlusPart').innerText = "Rs. " + pPlusTotal.toFixed(2) + " (" + totalPPlusHours + " hrs)";
     document.getElementById('resExtraDuty').innerText = "Rs. " + extraDutyTotal.toFixed(2);
     document.getElementById('resGross').innerText = "Rs. " + grossSalary.toFixed(2);
     document.getElementById('resEPF').innerText = "Rs. " + epfDeduction.toFixed(2);
     document.getElementById('resDeductions').innerText = "Rs. " + totalDeductions.toFixed(2);
     document.getElementById('resNet').innerText = "Rs. " + netSalary.toFixed(2);
+    
+    document.getElementById('resEPFCompany').innerText = "Rs. " + epfCompany.toFixed(2);
+    document.getElementById('resETFFCompany').innerText = "Rs. " + etfCompany.toFixed(2);
 
     document.getElementById('resultBox').style.display = 'block';
 }
